@@ -1,12 +1,18 @@
 package de.userk.consys;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 class Blackboard {
     private final Map<Sensor, Integer> data;
 
     public Blackboard(Map<Sensor, Integer> data) {
         this.data = data;
+    }
+
+    public Blackboard() {
+        this.data = new HashMap<>();
     }
 
     /**
@@ -29,7 +35,7 @@ class Blackboard {
      * @param sensor sensor value to read
      * @returns last known value
      */
-    public synchronized Integer read(Sensor sensor) {
-        return data.get(sensor);
+    public synchronized Optional<Integer> read(Sensor sensor) {
+        return Optional.ofNullable(data.get(sensor));
     }
 }
