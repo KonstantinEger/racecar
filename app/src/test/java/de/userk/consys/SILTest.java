@@ -36,7 +36,7 @@ public class SILTest {
         TimeStep[] scenario = new TimeStep[] {
                 new TimeStep(new int[] { 70, 100, 100, 100 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 60, 90, 110, 110 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
-                new TimeStep(new int[] { 255, 80, 120, 120 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
+                new TimeStep(new int[] { 245, 80, 120, 120 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 40, 70, 130, 130 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 30, 60, 140, 255 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 20, 50, 150, 150 }, SteerCmd.RIGHT, DriverCmd.FORWARD, 2000),
@@ -72,7 +72,7 @@ public class SILTest {
                 new TimeStep(new int[] { 70, 40, 253, 130 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 60, 30, 140, 140 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 50, 20, 150, 150 }, SteerCmd.LEFT, DriverCmd.FORWARD, 2000),
-                new TimeStep(new int[] { 40, 255, 160, 160 }, SteerCmd.LEFT, DriverCmd.FORWARD, 2000),
+                new TimeStep(new int[] { 40, 245, 160, 160 }, SteerCmd.LEFT, DriverCmd.FORWARD, 2000),
                 new TimeStep(new int[] { 40, 30, 170, 170 }, SteerCmd.STRAIGHT, DriverCmd.FORWARD, 2000),
         };
 

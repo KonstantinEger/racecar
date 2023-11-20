@@ -18,15 +18,9 @@ import de.userk.log.Logger;
 
 public class TestRunner {
     private final Class<?>[] testClasses;
-    private final ExecutorService pool;
-
-    public TestRunner(ExecutorService pool, Class<?>... testClasses) {
-        this.testClasses = testClasses;
-        this.pool = pool;
-    }
 
     public TestRunner(Class<?>... testClasses) {
-        this(Executors.newCachedThreadPool(), testClasses);
+        this.testClasses = testClasses;
     }
 
     public void runAll(String[] stringArgs) {
@@ -34,10 +28,12 @@ public class TestRunner {
 
         Logger.config.minLevel = args.verbose ? Logger.Level.DEBUG : Logger.Level.INFO;
 
+        ExecutorService pool = Executors.newFixedThreadPool(args.nThreads);
+
         TestResult result = new TestResult();
         for (Class<?> c : testClasses) {
             try {
-                TestResult newResult = runForClass(c, args);
+                TestResult newResult = runForClass(c, args, pool);
                 result.registerAll(newResult);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -48,7 +44,7 @@ public class TestRunner {
         pool.shutdown();
     }
 
-    private TestResult runForClass(Class<?> testClass, Args args)
+    private TestResult runForClass(Class<?> testClass, Args args, ExecutorService pool)
             throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         TestResult result = new TestResult();
         List<Method> annotatedMethods = Arrays.stream(testClass.getDeclaredMethods())
@@ -63,6 +59,7 @@ public class TestRunner {
             testCase.setAccessible(true);
             String testCaseName = testClass.getName() + "::" + testCase.getName();
             if (!args.regex.matcher(testCaseName).matches()) {
+                result.registerIgnored(testCaseName);
                 continue;
             }
 
@@ -109,6 +106,11 @@ public class TestRunner {
                     throw new IllegalArgumentException("-t or --test flag requires regex pattern");
                 }
                 result.regex = Pattern.compile(".*" + args[i + 1] + ".*");
+            } else if (s.equals("-p") || s.equals("--parallel")) {
+                if (args.length <= i + 1) {
+                    throw new IllegalArgumentException("-p or --parallel must be followed by number of threads");
+                }
+                result.nThreads = Integer.parseInt(args[i + 1]);
             }
         }
         return result;
@@ -117,6 +119,7 @@ public class TestRunner {
     private final class Args {
         public boolean verbose = false;
         public Pattern regex = Pattern.compile(".*");
+        public int nThreads = Runtime.getRuntime().availableProcessors();
     }
 
     private final class Tuple<A, B> {
