@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-class TestResult {
+public class TestResult {
     private final Map<String, ResultEntry> results;
 
     public TestResult() {

@@ -92,12 +92,13 @@ public class SILTest {
                 new SensorFilterAdapter(sensors.backLeft),
                 new SensorFilterAdapter(sensors.backRight));
 
-        for (TimeStep step : testCase) {
+        for (int i = 0; i < testCase.length; i++) {
+            TimeStep step = testCase[i];
             int[] d = step.sensorData;
             sensors.allSense(d[0], d[1], d[2], d[3]);
             ctrl.step();
-            assertEq(driver.getAndReset(), Optional.of(step.driverCmd));
-            assertEq(steering.getAndReset(), Optional.of(step.steerCmd));
+            assertEq(driver.getAndReset(), Optional.of(step.driverCmd), "failed at step " + i);
+            assertEq(steering.getAndReset(), Optional.of(step.steerCmd), "failed at step " + i);
             Thread.sleep(step.sleepTime);
         }
     }

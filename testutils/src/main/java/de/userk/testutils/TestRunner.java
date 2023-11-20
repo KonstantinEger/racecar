@@ -23,7 +23,7 @@ public class TestRunner {
         this.testClasses = testClasses;
     }
 
-    public void runAll(String[] stringArgs) {
+    public TestResult runAll(String[] stringArgs) {
         Args args = parseArgs(stringArgs);
 
         Logger.config.minLevel = args.verbose ? Logger.Level.DEBUG : Logger.Level.INFO;
@@ -42,6 +42,8 @@ public class TestRunner {
         result.print(System.out);
 
         pool.shutdown();
+
+        return result;
     }
 
     private TestResult runForClass(Class<?> testClass, Args args, ExecutorService pool)
