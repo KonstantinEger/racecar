@@ -25,4 +25,22 @@ public class SensorFilterAdapterTest {
 
         assertEq(received, expected);
     }
+
+    @TestCase
+    void testBigJumpsIgnored() throws InterruptedException {
+        MockSensor mockSensor = new MockSensor();
+        Sensor adapter = new SensorFilterAdapter(mockSensor);
+        List<Integer> inputs = Arrays.asList(100, 100, 10, 100, 100);
+        List<Integer> expected = Arrays.asList(100, 100, 100, 100);
+        List<Integer> received = new ArrayList<>();
+
+        adapter.registerObserver(v -> received.add(v));
+
+        for (int value : inputs) {
+            mockSensor.sense(value);
+            Thread.sleep(500);
+        }
+
+        assertEq(received, expected);
+    }
 }
