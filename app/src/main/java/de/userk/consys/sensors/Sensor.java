@@ -1,4 +1,4 @@
-package de.userk.consys;
+package de.userk.consys.sensors;
 
 public interface Sensor {
     void registerObserver(SensorObserver observer);

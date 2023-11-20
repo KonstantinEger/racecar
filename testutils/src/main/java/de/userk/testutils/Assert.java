@@ -25,6 +25,16 @@ public class Assert {
         }
     }
 
+    public static <T> void assertEq(T a, T b) {
+        assertEq(a, b, "a and b should be equal");
+    }
+
+    public static <T> void assertEq(T a, T b, String message) {
+        if (!a.equals(b)) {
+            throw new AssertionFailedException(message + " (expected " + a + " to equal " + b + ")");
+        }
+    }
+
     public static void assertPresent(Optional<?> value) {
         assertPresent(value, "value should be present but was empty");
     }
@@ -61,5 +71,13 @@ public class Assert {
         if (!threw) {
             throw new AssertionFailedException(message);
         }
+    }
+
+    public static void assertUnreachable(String message) {
+        throw new AssertionFailedException(message);
+    }
+
+    public static void assertUnreachable() {
+        assertUnreachable("reached unreachable code");
     }
 }
