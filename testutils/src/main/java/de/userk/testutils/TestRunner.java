@@ -18,10 +18,15 @@ import de.userk.log.Logger;
 
 public class TestRunner {
     private final Class<?>[] testClasses;
-    private final ExecutorService pool = Executors.newCachedThreadPool();
+    private final ExecutorService pool;
+
+    public TestRunner(ExecutorService pool, Class<?>... testClasses) {
+        this.testClasses = testClasses;
+        this.pool = pool;
+    }
 
     public TestRunner(Class<?>... testClasses) {
-        this.testClasses = testClasses;
+        this(Executors.newCachedThreadPool(), testClasses);
     }
 
     public void runAll(String[] stringArgs) {
