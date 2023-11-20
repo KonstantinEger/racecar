@@ -40,16 +40,13 @@ class TestResult {
         return sum;
     }
 
-    public void print(PrintStream o, boolean verbose) {
+    public void print(PrintStream o) {
         int success = successCount();
         int err = errorCount();
 
         for (Entry<String, ResultEntry> entry : results.entrySet()) {
             if (entry.getValue().success) {
                 o.println("✅ " + entry.getKey() + ": successful");
-                if (verbose) {
-                    o.println(entry.getValue().capturedOutput);
-                }
             } else {
                 o.println("❌ " + entry.getKey() + ": failed\n" + entry.getValue().capturedOutput);
             }

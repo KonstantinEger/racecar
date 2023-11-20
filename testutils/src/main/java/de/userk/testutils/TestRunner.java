@@ -14,6 +14,8 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import de.userk.log.Logger;
+
 public class TestRunner {
     private final Class<?>[] testClasses;
     private final ExecutorService pool = Executors.newCachedThreadPool();
@@ -24,6 +26,9 @@ public class TestRunner {
 
     public void runAll(String[] stringArgs) {
         Args args = parseArgs(stringArgs);
+
+        Logger.config.minLevel = args.verbose ? Logger.Level.DEBUG : Logger.Level.INFO;
+
         TestResult result = new TestResult();
         for (Class<?> c : testClasses) {
             try {
@@ -33,7 +38,8 @@ public class TestRunner {
                 e.printStackTrace();
             }
         }
-        result.print(System.out, args.verbose);
+        result.print(System.out);
+
         pool.shutdown();
     }
 
@@ -61,7 +67,7 @@ public class TestRunner {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            }, testCaseName);
+            });
             futures.add(new Tuple<>(testCaseName, fut));
         }
 
