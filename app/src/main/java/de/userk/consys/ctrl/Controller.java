@@ -35,7 +35,7 @@ public class Controller {
     }
 
     public void step() {
-        log.info("starting decision process");
+        log.debug("starting decision process");
         if (!sensorData.isInitialized()) {
             log.debug("some sensor data invalid; aborting decision");
             return;
@@ -44,18 +44,17 @@ public class Controller {
         SteerCmd steerCmd = SteerCmd.STRAIGHT;
         DriverCmd driverCmd = DriverCmd.FORWARD;
 
+        // Reading freshest sensor values. This is thread safe because its only reading,
+        // never writing.
         int frontLeft = sensorData.frontLeft;
         int frontRight = sensorData.frontRight;
         int backLeft = sensorData.backLeft;
         int backRight = sensorData.backRight;
-        log.debug("sensed values (fl, fr, bl, br): (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
+        log.debug("using values (fl, fr, bl, br): (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
 
-        // left is close but right is space
-        if (sensorData.frontLeft < 25 && sensorData.frontRight > 30) {
-            steerCmd = SteerCmd.RIGHT;
-            // right is close but left is space
-        } else if (sensorData.frontRight < 25 && sensorData.frontLeft > 30) {
-            steerCmd = SteerCmd.LEFT;
+        if (frontLeft < 30 || frontRight < 30) {
+            // close to a wall, turn towards more space
+            steerCmd = frontLeft < frontRight ? SteerCmd.RIGHT : SteerCmd.LEFT;
         }
 
         driver.handle(driverCmd);
