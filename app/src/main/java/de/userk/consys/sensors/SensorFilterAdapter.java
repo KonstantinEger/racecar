@@ -48,7 +48,6 @@ public class SensorFilterAdapter implements Sensor {
         double secondsSinceLastValue = (now - lastValueTimestamp) / 1000.0;
         int absoluteCentimetersDiff = Math.abs(value - lastValue);
         double centimetersPerSecond = absoluteCentimetersDiff / secondsSinceLastValue;
-        log.debug("%f cm/s", centimetersPerSecond);
         if (centimetersPerSecond > 10) {
             log.debug("recognized value jump: %f cm/s", centimetersPerSecond);
             return true;

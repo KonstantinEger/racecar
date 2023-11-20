@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import de.userk.consys.Helper.MockSensor;
 import de.userk.testutils.TestCase;
 
 public class SensorFilterAdapterTest {
@@ -18,23 +19,10 @@ public class SensorFilterAdapterTest {
 
         adapter.registerObserver(v -> received.add(v));
 
-        mockSensor.send(100);
-        mockSensor.send(255);
-        mockSensor.send(100);
+        mockSensor.sense(100);
+        mockSensor.sense(255);
+        mockSensor.sense(100);
 
         assertEq(received, expected);
-    }
-
-    private static class MockSensor implements Sensor {
-        private SensorObserver observer;
-
-        @Override
-        public void registerObserver(SensorObserver observer) {
-            this.observer = observer;
-        }
-
-        public void send(int value) {
-            observer.newValue(value);
-        }
     }
 }
