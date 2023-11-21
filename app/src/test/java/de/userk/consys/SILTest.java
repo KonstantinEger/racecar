@@ -11,7 +11,9 @@ import java.util.Optional;
 import de.userk.consys.Helper.MockAllSensors;
 import de.userk.consys.Helper.MockDriver;
 import de.userk.consys.ctrl.Controller;
-import de.userk.consys.sensors.SensorFilterAdapter;
+import de.userk.consys.sensors.filter.AllFilters;
+import de.userk.consys.sensors.filter.SensorFilterAdapter;
+import de.userk.consys.sensors.filter.ValueFiltersFactory;
 import de.userk.testutils.TestCase;
 
 public class SILTest {
@@ -84,13 +86,14 @@ public class SILTest {
         MockSteering steering = new MockSteering();
         MockAllSensors sensors = new MockAllSensors();
 
+        ValueFiltersFactory filtersFactory = new AllFilters();
         Controller ctrl = new Controller(
                 driver,
                 steering,
-                new SensorFilterAdapter(sensors.frontLeft),
-                new SensorFilterAdapter(sensors.frontRight),
-                new SensorFilterAdapter(sensors.backLeft),
-                new SensorFilterAdapter(sensors.backRight));
+                new SensorFilterAdapter(sensors.frontLeft, filtersFactory),
+                new SensorFilterAdapter(sensors.frontRight, filtersFactory),
+                new SensorFilterAdapter(sensors.backLeft, filtersFactory),
+                new SensorFilterAdapter(sensors.backRight, filtersFactory));
 
         for (int i = 0; i < testCase.length; i++) {
             TimeStep step = testCase[i];
