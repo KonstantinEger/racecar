@@ -52,9 +52,13 @@ public class Controller {
         int backRight = sensorData.backRight;
         log.debug("using values (fl, fr, bl, br): (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
 
-        if (frontLeft < 30 || frontRight < 30) {
+        if (frontLeft < 50 || frontRight < 50) {
             // close to a wall, turn towards more space
             steerCmd = frontLeft < frontRight ? SteerCmd.RIGHT : SteerCmd.LEFT;
+        }
+
+        if (frontLeft < 20 && frontRight < 20) {
+            driverCmd = DriverCmd.STOP;
         }
 
         driver.handle(driverCmd);
@@ -77,6 +81,7 @@ public class Controller {
                 Controller.this.step();
             }
         });
+        loopThread.start();
     }
 
     public void stopStepLoopAsync() {
