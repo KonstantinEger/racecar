@@ -1,0 +1,30 @@
+<project>
+    <target name="clean">
+        <delete dir="target"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="target/classes"/>
+        <javac srcdir="app/src/main/java" modulepath="lib/javafx" destdir="target/classes">
+            <compilerarg line="--add-modules javafx.controls"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="target/jar"/>
+        <jar destfile="target/jar/consys-gui.jar">
+            <fileset dir="target/classes" />
+            <fileset dir="app/src/main/resources" />
+            <manifest>
+                <attribute name="Main-Class" value="de.userk.consys.gui.GuiApp"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java jar="target/jar/consys-gui.jar" modulepath="lib/javafx" fork="true">
+            <jvmarg line="--add-modules javafx.controls"/>
+        </java>
+    </target>
+
+</project>
