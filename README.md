@@ -41,8 +41,8 @@ ant run-sil-gui
 ```
 
 Diese Variante nimmt die (aktuell 4) Testszenarien aus der Klasse
-`src/test/java/de/userk/consys/SILTest.java` und spielt sie nacheinander in der
-GUI ab. Die Slider zeigen dabei den aktuellen Sensorwert und die Grafik die
+`app/src/test/java/de/userk/consys/SILTest.java` und spielt sie nacheinander in
+der GUI ab. Die Slider zeigen dabei den aktuellen Sensorwert und die Grafik die
 Entscheidung an. Es werden keine Assertions bezüglich des SILTests gemacht.
 
 ### SIL-Test
@@ -57,4 +57,4 @@ ant run-sil-test
 ```
 
 Diese Variante führt die (aktuell 4) Testszenarien aus der Klasse
-`src/test/java/de/userk/consys/SILTest.java` als Unit-Test parallel aus.
+`app/src/test/java/de/userk/consys/SILTest.java` als Unit-Test parallel aus.
