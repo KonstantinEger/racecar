@@ -16,7 +16,7 @@ public class BigJumpsValueFilter implements ValueFilter {
         int absoluteCentimetersDiff = Math.abs(value - lastValue);
         double centimetersPerSecond = absoluteCentimetersDiff / secondsSinceLastValue;
         log.debug("%f cm/s", centimetersPerSecond);
-        if (centimetersPerSecond > 10.0) {
+        if (centimetersPerSecond > 20.0) {
             log.debug("recognized big jump %f cm/s", centimetersPerSecond);
             return Optional.empty();
         } else {

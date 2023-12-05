@@ -41,6 +41,10 @@ public class SliderSensor implements Sensor {
         this.observer = observer;
     }
 
+    public void overwriteValue(double value) {
+        slider.setValue(value);
+    }
+
     public void startThread(long interval) {
         log.info("starting sensor loop with interval of %d ms", interval);
         if (threadRunning) {

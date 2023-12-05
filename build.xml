@@ -3,14 +3,20 @@
         <delete dir="target"/>
     </target>
 
-    <target name="compile">
+    <!-- **************************************** -->
+    <!-- *                                      *-->
+    <!-- *              GUI GUI                 *-->
+    <!-- *                                      *-->
+    <!-- **************************************** -->
+
+    <target name="compile-gui-gui">
         <mkdir dir="target/classes"/>
         <javac srcdir="app/src/main/java" modulepath="lib/javafx" destdir="target/classes">
             <compilerarg line="--add-modules javafx.controls"/>
         </javac>
     </target>
 
-    <target name="jar" depends="compile">
+    <target name="jar-gui-gui" depends="compile-gui-gui">
         <mkdir dir="target/jar"/>
         <jar destfile="target/jar/consys-gui.jar">
             <fileset dir="target/classes" />
@@ -21,10 +27,75 @@
         </jar>
     </target>
 
-    <target name="run" depends="jar">
+    <target name="run-gui-gui" depends="jar-gui-gui">
         <java jar="target/jar/consys-gui.jar" modulepath="lib/javafx" fork="true">
             <jvmarg line="--add-modules javafx.controls"/>
         </java>
     </target>
 
+    <!-- **************************************** -->
+    <!-- *                                      *-->
+    <!-- *              SIL GUI                 *-->
+    <!-- *                                      *-->
+    <!-- **************************************** -->
+
+    <target name="compile-sil-gui">
+        <mkdir dir="target/classes"/>
+        <javac includeantruntime="false" modulepath="lib/javafx" destdir="target/classes">
+            <src>
+                <pathelement location="app/src/main/java"/>
+                <pathelement location="app/src/test/java"/>
+                <pathelement location="testutils/src/main/java"/>
+            </src>
+            <compilerarg line="--add-modules javafx.controls"/>
+        </javac>
+    </target>
+    
+    <target name="jar-sil-gui" depends="compile-sil-gui">
+        <mkdir dir="target/jar"/>
+        <jar destfile="target/jar/consys-sil-gui.jar">
+            <fileset dir="target/classes" />
+            <fileset dir="app/src/main/resources" />
+            <manifest>
+                <attribute name="Main-Class" value="de.userk.consys.gui.GuiSIL"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run-sil-gui" depends="jar-sil-gui">
+        <java jar="target/jar/consys-sil-gui.jar" modulepath="lib/javafx" fork="true">
+            <jvmarg line="--add-modules javafx.controls"/>
+        </java>
+    </target>
+
+    <!-- **************************************** -->
+    <!-- *                                      *-->
+    <!-- *              SIL TEST                *-->
+    <!-- *                                      *-->
+    <!-- **************************************** -->
+
+    <target name="compile-sil-test">
+        <mkdir dir="target/classes"/>
+        <javac includeantruntime="false" excludes="**/gui/**/*" destdir="target/classes">
+            <src>
+                <pathelement location="app/src/main/java"/>
+                <pathelement location="app/src/test/java"/>
+                <pathelement location="testutils/src/main/java"/>
+            </src>
+        </javac>
+    </target>
+
+    <target name="jar-sil-test" depends="compile-sil-test">
+        <mkdir dir="target/jar"/>
+        <jar destfile="target/jar/consys-sil-test.jar">
+            <fileset dir="target/classes" />
+            <manifest>
+                <attribute name="Main-Class" value="de.userk.consys.AllTests"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run-sil-test" depends="jar-sil-test">
+        <java jar="target/jar/consys-sil-test.jar" fork="true"/>
+    </target>
 </project>

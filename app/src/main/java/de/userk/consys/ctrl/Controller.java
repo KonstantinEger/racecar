@@ -52,14 +52,18 @@ public class Controller {
         int backRight = sensorData.backRight;
         log.debug("using values (fl, fr, bl, br): (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
 
-        if (frontLeft < 50 || frontRight < 50) {
+        if (frontLeft < 30 || frontRight < 30) {
             // close to a wall, turn towards more space
             steerCmd = frontLeft < frontRight ? SteerCmd.RIGHT : SteerCmd.LEFT;
         }
+        // if (frontLeft < 50 || frontRight < 50) {
+        // // close to a wall, turn towards more space
+        // steerCmd = frontLeft < frontRight ? SteerCmd.RIGHT : SteerCmd.LEFT;
+        // }
 
-        if (frontLeft < 20 && frontRight < 20) {
-            driverCmd = DriverCmd.STOP;
-        }
+        // if (frontLeft < 20 && frontRight < 20) {
+        // driverCmd = DriverCmd.STOP;
+        // }
 
         driver.handle(driverCmd);
         log.debug("sent driver command: %s", driverCmd);

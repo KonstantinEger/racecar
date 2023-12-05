@@ -10,7 +10,7 @@ public class AllFilters implements ValueFiltersFactory {
 
         filters.add(new ErrorValueFilter());
         // filters.add(new ExtrapolatingFilter());
-        // filters.add(new BigJumpsValueFilter());
+        filters.add(new BigJumpsValueFilter());
 
         return filters;
     }
