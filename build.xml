@@ -57,7 +57,7 @@
             <fileset dir="target/classes" />
             <fileset dir="app/src/main/resources" />
             <manifest>
-                <attribute name="Main-Class" value="de.userk.consys.gui.GuiSIL"/>
+                <attribute name="Main-Class" value="de.userk.consys.gui.SILGui"/>
             </manifest>
         </jar>
     </target>

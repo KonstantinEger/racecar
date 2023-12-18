@@ -6,7 +6,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-public class GuiSIL extends Application {
+public class SILGui extends Application {
     private final Gui gui = new Gui();
 
     @Override
