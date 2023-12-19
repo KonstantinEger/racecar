@@ -14,8 +14,12 @@ public class App {
     private static final Logger log = Logger.forClass(App.class);
 
     public static void main(String[] args) throws Exception {
-        String sensorFactoryClassName = "de.userk.consys.sil.SILSensorActorFactory";
-        String actorFactoryClassName = "de.userk.consys.gui.GuiSensorActorFactory";
+        if (!(args.length == 1 || args.length == 2)) {
+            throw new IllegalArgumentException("pass factories as arguments");
+        }
+
+        String sensorFactoryClassName = args[0];
+        String actorFactoryClassName = args.length > 1 ? args[1] : args[0];
 
         SensorActorFactory sensorFactory = loadAndInstantiate(sensorFactoryClassName);
         SensorActorFactory actorFactory = sensorFactoryClassName.equals(actorFactoryClassName)
