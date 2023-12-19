@@ -3,6 +3,47 @@
         <delete dir="target"/>
     </target>
 
+    <target name="compile-core">
+        <mkdir dir="target/classes" />
+        <javac includeantruntime="false" srcdir="core/src/main/java" destdir="target/classes" />
+    </target>
+
+    <target name="compile-gui" depends="compile-core">
+        <javac includeantruntime="false" srcdir="gui/src/main/java" destdir="target/classes" modulepath="lib/javafx">
+            <compilerarg line="--add-modules javafx.controls"/>
+        </javac>
+
+        <mkdir dir="target/resources" />
+        <copy toDir="target/resources">
+            <fileset dir="gui/src/main/resources" />
+        </copy>
+    </target>
+
+    <target name="compile-ev3" depends="compile-core">
+        <javac includeantruntime="false" srcdir="ev3/src/main/java" destdir="target/classes" classpath="lib/ev3/ev3classes.jar" />
+    </target>
+
+    <target name="compile-sil" depends="compile-core">
+        <javac includeantruntime="false" destdir="target/classes">
+            <src>
+                <pathelement location="core/src/test/java"/>
+                <pathelement location="sil/src/test/java"/>
+                <pathelement location="testutils/src/main/java"/>
+            </src>
+        </javac>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="target/jar" />
+        <jar destfile="target/jar/consys.jar">
+            <fileset dir="target/classes" />
+            <fileset dir="target/resources" erroronmissingdir="false" />
+            <manifest>
+                <attribute name="Main-Class" value="de.userk.consys.App"/>
+            </manifest>
+        </jar>
+    </target>
+
     <!-- **************************************** -->
     <!-- *                                      *-->
     <!-- *              GUI GUI                 *-->
@@ -11,7 +52,7 @@
 
     <target name="compile-gui-gui">
         <mkdir dir="target/classes"/>
-        <javac srcdir="app/src/main/java" modulepath="lib/javafx" destdir="target/classes">
+        <javac srcdir="app/src/main/java" excludes="**/ev3/**" modulepath="lib/javafx" destdir="target/classes">
             <compilerarg line="--add-modules javafx.controls"/>
         </javac>
     </target>
@@ -22,7 +63,7 @@
             <fileset dir="target/classes" />
             <fileset dir="app/src/main/resources" />
             <manifest>
-                <attribute name="Main-Class" value="de.userk.consys.gui.GuiApp"/>
+                <attribute name="Main-Class" value="de.userk.consys.App"/>
             </manifest>
         </jar>
     </target>
