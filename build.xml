@@ -23,6 +23,10 @@
         <javac includeantruntime="false" srcdir="ev3/src/main/java" destdir="target/classes" classpath="lib/ev3/ev3classes.jar" />
     </target>
 
+    <target name="compile-nxt" depends="compile-core">
+        <javac includeantruntime="false" srcdir="nxt/src/main/java" destdir="target/classes" classpath="lib/nxt/classes.jar" />
+    </target>
+
     <target name="compile-sil" depends="compile-core">
         <javac includeantruntime="false" destdir="target/classes">
             <src>
@@ -44,99 +48,24 @@
         </jar>
     </target>
 
-    <!-- **************************************** -->
-    <!-- *                                      *-->
-    <!-- *              GUI GUI                 *-->
-    <!-- *                                      *-->
-    <!-- **************************************** -->
-
-    <target name="compile-gui-gui">
-        <mkdir dir="target/classes"/>
-        <javac srcdir="app/src/main/java" excludes="**/ev3/**" modulepath="lib/javafx" destdir="target/classes">
-            <compilerarg line="--add-modules javafx.controls"/>
-        </javac>
-    </target>
-
-    <target name="jar-gui-gui" depends="compile-gui-gui">
-        <mkdir dir="target/jar"/>
-        <jar destfile="target/jar/consys-gui.jar">
-            <fileset dir="target/classes" />
-            <fileset dir="app/src/main/resources" />
-            <manifest>
-                <attribute name="Main-Class" value="de.userk.consys.App"/>
-            </manifest>
-        </jar>
-    </target>
-
-    <target name="run-gui-gui" depends="jar-gui-gui">
-        <java jar="target/jar/consys-gui.jar" modulepath="lib/javafx" fork="true">
-            <jvmarg line="--add-modules javafx.controls"/>
+    <target name="run-sil-sil" depends="compile-sil,jar">
+        <java jar="target/jar/consys.jar" fork="true">
+            <arg value="de.userk.consys.sil.SILSensorActorFactory" />
         </java>
     </target>
 
-    <!-- **************************************** -->
-    <!-- *                                      *-->
-    <!-- *              SIL GUI                 *-->
-    <!-- *                                      *-->
-    <!-- **************************************** -->
-
-    <target name="compile-sil-gui">
-        <mkdir dir="target/classes"/>
-        <javac includeantruntime="false" modulepath="lib/javafx" destdir="target/classes">
-            <src>
-                <pathelement location="app/src/main/java"/>
-                <pathelement location="app/src/test/java"/>
-                <pathelement location="testutils/src/main/java"/>
-            </src>
-            <compilerarg line="--add-modules javafx.controls"/>
-        </javac>
-    </target>
-    
-    <target name="jar-sil-gui" depends="compile-sil-gui">
-        <mkdir dir="target/jar"/>
-        <jar destfile="target/jar/consys-sil-gui.jar">
-            <fileset dir="target/classes" />
-            <fileset dir="app/src/main/resources" />
-            <manifest>
-                <attribute name="Main-Class" value="de.userk.consys.gui.SILGui"/>
-            </manifest>
-        </jar>
-    </target>
-
-    <target name="run-sil-gui" depends="jar-sil-gui">
-        <java jar="target/jar/consys-sil-gui.jar" modulepath="lib/javafx" fork="true">
+    <target name="run-gui-gui" depends="compile-gui,jar">
+        <java jar="target/jar/consys.jar" fork="true" modulepath="lib/javafx">
             <jvmarg line="--add-modules javafx.controls"/>
+            <arg value="de.userk.consys.gui.GuiSensorActorFactory" />
         </java>
     </target>
 
-    <!-- **************************************** -->
-    <!-- *                                      *-->
-    <!-- *              SIL TEST                *-->
-    <!-- *                                      *-->
-    <!-- **************************************** -->
-
-    <target name="compile-sil-test">
-        <mkdir dir="target/classes"/>
-        <javac includeantruntime="false" excludes="**/gui/**/*" destdir="target/classes">
-            <src>
-                <pathelement location="app/src/main/java"/>
-                <pathelement location="app/src/test/java"/>
-                <pathelement location="testutils/src/main/java"/>
-            </src>
-        </javac>
-    </target>
-
-    <target name="jar-sil-test" depends="compile-sil-test">
-        <mkdir dir="target/jar"/>
-        <jar destfile="target/jar/consys-sil-test.jar">
-            <fileset dir="target/classes" />
-            <manifest>
-                <attribute name="Main-Class" value="de.userk.consys.AllTests"/>
-            </manifest>
-        </jar>
-    </target>
-
-    <target name="run-sil-test" depends="jar-sil-test">
-        <java jar="target/jar/consys-sil-test.jar" fork="true"/>
+    <target name="run-sil-gui" depends="compile-gui,compile-sil,jar">
+        <java jar="target/jar/consys.jar" fork="true" modulepath="lib/javafx">
+            <jvmarg line="--add-modules javafx.controls"/>
+            <arg value="de.userk.consys.sil.SILSensorActorFactory" />
+            <arg value="de.userk.consys.gui.GuiSensorActorFactory" />
+        </java>
     </target>
 </project>
