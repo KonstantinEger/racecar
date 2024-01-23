@@ -1,7 +1,5 @@
 package de.userk.consys.sensors.filter;
 
-import java.util.Optional;
-
 import de.userk.log.Logger;
 
 public class BigJumpsValueFilter implements ValueFilter {
@@ -10,7 +8,7 @@ public class BigJumpsValueFilter implements ValueFilter {
     private long lastValueTimestamp;
 
     @Override
-    public Optional<Integer> filter(int value) {
+    public Integer filter(int value) {
         long now = System.currentTimeMillis();
         double secondsSinceLastValue = (now - lastValueTimestamp) / 1000.0;
         int absoluteCentimetersDiff = Math.abs(value - lastValue);
@@ -18,11 +16,11 @@ public class BigJumpsValueFilter implements ValueFilter {
         log.debug("%f cm/s", centimetersPerSecond);
         if (centimetersPerSecond > 20.0) {
             log.debug("recognized big jump %f cm/s", centimetersPerSecond);
-            return Optional.empty();
+            return null;
         } else {
             lastValue = value;
             lastValueTimestamp = now;
-            return Optional.of(value);
+            return value;
         }
     }
 }

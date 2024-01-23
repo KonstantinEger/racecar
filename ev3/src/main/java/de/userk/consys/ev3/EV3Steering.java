@@ -9,6 +9,7 @@ public class EV3Steering implements Steering {
     public static final Logger log = Logger.forClass(EV3Steering.class);
     public final RegulatedMotor motor;
     private final int angle;
+    private SteerCmd lastCmd = SteerCmd.STRAIGHT;
 
     public EV3Steering(RegulatedMotor motor, int angle) {
         this.motor = motor;
@@ -17,15 +18,37 @@ public class EV3Steering implements Steering {
 
 	@Override
 	public void handle(SteerCmd cmd) {
-        // FIXME: does not work because doesn't take current angle into account.
+        int rotateAngle = 0;
 
         if (cmd.equals(SteerCmd.LEFT)) {
-            log.debug("rotating %d°", angle);
-            motor.rotate(angle);
-        } else if (cmd.equals(SteerCmd.RIGHT)) {
-            log.debug("rotating -%d°", angle);
-            motor.rotate(-angle);
+            if (lastCmd.equals(SteerCmd.STRAIGHT)) {
+                rotateAngle = -angle;
+            }
+            if (lastCmd.equals(SteerCmd.RIGHT)) {
+                rotateAngle = -angle * 2;
+            }
         }
+        if (cmd.equals(SteerCmd.STRAIGHT)) {
+            if (lastCmd.equals(SteerCmd.LEFT)) {
+                rotateAngle = angle;
+            }
+            if (lastCmd.equals(SteerCmd.RIGHT)) {
+                rotateAngle = -angle;
+            }
+        }
+        if (cmd.equals(SteerCmd.RIGHT)) {
+            if (lastCmd.equals(SteerCmd.STRAIGHT)) {
+                rotateAngle = angle;
+            }
+            if (lastCmd.equals(SteerCmd.LEFT)) {
+                rotateAngle = angle * 2;
+            }
+        }
+
+        log.debug("rotating %d°", rotateAngle);
+        motor.rotate(rotateAngle);
+
+        lastCmd = cmd;
 	}
 
 }

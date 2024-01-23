@@ -4,7 +4,22 @@ import java.io.PrintStream;
 
 public class Logger {
     public static enum Level {
-        DEBUG, INFO, WARN, ERROR
+        DEBUG, INFO, WARN, ERROR;
+
+        public static Level fromString(String s) {
+            String input = s.toUpperCase();
+            if ("DEBUG".equals(input)) {
+                return Level.DEBUG;
+            } else if ("INFO".equals(input)) {
+                return Level.INFO;
+            } else if ("WARN".equals(input)) {
+                return Level.WARN;
+            } else if ("ERROR".equals(input)) {
+                return Level.ERROR;
+            } else {
+                throw new IllegalArgumentException(s + " cannot be parsed.");
+            }
+        }
     }
 
     public static class LoggerConfig {

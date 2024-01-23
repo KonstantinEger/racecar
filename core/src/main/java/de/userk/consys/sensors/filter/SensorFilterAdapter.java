@@ -1,7 +1,6 @@
 package de.userk.consys.sensors.filter;
 
 import java.util.List;
-import java.util.Optional;
 
 import de.userk.consys.sensors.Sensor;
 import de.userk.consys.sensors.SensorObserver;
@@ -26,16 +25,18 @@ public class SensorFilterAdapter implements Sensor {
     }
 
     @Override
-    public void registerObserver(SensorObserver observer) {
+    public void registerObserver(final SensorObserver observer) {
         log.info("registering observer %s to sensor %s", observer, unfiltered);
-        unfiltered.registerObserver(value -> {
-            Optional<Integer> filteredValue = Optional.of(value);
-            for (int i = 0; i < filters.size() && filteredValue.isPresent(); i++) {
-                filteredValue = filters.get(i).filter(filteredValue.get());
-            }
+        unfiltered.registerObserver(new SensorObserver() {
+            public void newValue(int value) {
+                Integer filteredValue = value;
+                for (int i = 0; i < filters.size() && filteredValue!= null; i++) {
+                    filteredValue = filters.get(i).filter(filteredValue);
+                }
 
-            if (filteredValue.isPresent()) {
-                observer.newValue(filteredValue.get());
+                if (filteredValue != null) {
+                    observer.newValue(filteredValue);
+                }
             }
         });
     }

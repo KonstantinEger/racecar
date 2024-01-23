@@ -26,15 +26,18 @@ public class SILSensorActorFactory implements SensorActorFactory {
         this.steering = new SILSteering(this);
         this.driver = new SILDriver(this);
 
-        Thread thread = new Thread(() -> {
-            try {
-                runScenario(SILTest.turnsLeftIfWallFrontRightScenario);
-                runScenario(SILTest.turnsLeftIfWallFrontRightWithErrorsScenario);
-                runScenario(SILTest.turnsRightIfWallFrontLeftScenario);
-                runScenario(SILTest.turnsRightIfWallFrontLeftWithErrorsScenario);
-            } catch (InterruptedException e) {
-                log.error("interrupted while running scenarios %s", e);
-                throw new RuntimeException(e);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SILSensorActorFactory.this.runScenario(SILTest.turnsLeftIfWallFrontRightScenario);
+                    SILSensorActorFactory.this.runScenario(SILTest.turnsLeftIfWallFrontRightWithErrorsScenario);
+                    SILSensorActorFactory.this.runScenario(SILTest.turnsRightIfWallFrontLeftScenario);
+                    SILSensorActorFactory.this.runScenario(SILTest.turnsRightIfWallFrontLeftWithErrorsScenario);
+                } catch (InterruptedException e) {
+                    log.error("interrupted while running scenarios %s", e);
+                    throw new RuntimeException(e);
+                }
             }
         });
         thread.start();

@@ -3,6 +3,8 @@ package de.userk.consys.gui;
 import de.userk.consys.sensors.Sensor;
 import de.userk.consys.sensors.SensorObserver;
 import de.userk.log.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -56,22 +58,25 @@ public class SliderSensor implements Sensor {
 
         threadRunning = true;
 
-        thread = new Thread(() -> {
-            while (threadRunning) {
-                try {
-                    Thread.sleep(interval);
-                } catch (InterruptedException e) {
-                    log.error("error in sensor loop thread: %s", e);
-                    return;
-                }
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (threadRunning) {
+                    try {
+                        Thread.sleep(interval);
+                    } catch (InterruptedException e) {
+                        log.error("error in sensor loop thread: %s", e);
+                        return;
+                    }
 
-                if (observer == null) {
-                    continue;
-                }
+                    if (observer == null) {
+                        continue;
+                    }
 
-                int value = (int) Math.round(lastValue);
-                log.debug("sending value %d", value);
-                observer.newValue(value);
+                    int value = (int) Math.round(lastValue);
+                    log.debug("sending value %d", value);
+                    observer.newValue(value);
+                }
             }
         });
         thread.start();
@@ -90,9 +95,12 @@ public class SliderSensor implements Sensor {
 
     public Node getView() {
         final Label text = new Label(name + ": " + slider.getValue());
-        slider.valueProperty().addListener((_obs, old, newVal) -> {
-            lastValue = (double) newVal;
-            text.setText(name + ": " + Math.round((double) newVal));
+        slider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> _obs, Number old, Number newVal) {
+                lastValue = (double) newVal;
+                text.setText(name + ": " + Math.round((double) newVal));
+            }
         });
         VBox vBox = new VBox();
         vBox.getChildren().addAll(slider, text);

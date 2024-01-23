@@ -5,12 +5,15 @@
 
     <target name="compile-core">
         <mkdir dir="target/classes" />
-        <javac includeantruntime="false" srcdir="core/src/main/java" destdir="target/classes" />
+        <javac source="7" target="7" includeantruntime="false" srcdir="core/src/main/java" destdir="target/classes" />
+        <mkdir dir="target/resources" />
+        <copy toDir="target/resources">
+            <fileset dir="core/src/main/resources" />
+        </copy>
     </target>
 
     <target name="compile-gui" depends="compile-core">
-        <javac includeantruntime="false" srcdir="gui/src/main/java" destdir="target/classes" modulepath="lib/javafx">
-            <compilerarg line="--add-modules javafx.controls"/>
+        <javac source="7" target="7" includeantruntime="false" srcdir="gui/src/main/java" destdir="target/classes" classpath="">
         </javac>
 
         <mkdir dir="target/resources" />
@@ -20,15 +23,15 @@
     </target>
 
     <target name="compile-ev3" depends="compile-core">
-        <javac includeantruntime="false" srcdir="ev3/src/main/java" destdir="target/classes" classpath="lib/ev3/ev3classes.jar" />
+        <javac source="7" target="7" includeantruntime="false" srcdir="ev3/src/main/java" destdir="target/classes" classpath="lib/ev3/ev3classes.jar" />
     </target>
 
     <target name="compile-nxt" depends="compile-core">
-        <javac includeantruntime="false" srcdir="nxt/src/main/java" destdir="target/classes" classpath="lib/nxt/classes.jar" />
+        <javac source="7" target="7" includeantruntime="false" srcdir="nxt/src/main/java" destdir="target/classes" classpath="lib/nxt/classes.jar" />
     </target>
 
     <target name="compile-sil" depends="compile-core">
-        <javac includeantruntime="false" destdir="target/classes">
+        <javac source="7" target="7" includeantruntime="false" destdir="target/classes">
             <src>
                 <pathelement location="core/src/test/java"/>
                 <pathelement location="sil/src/test/java"/>
@@ -48,24 +51,9 @@
         </jar>
     </target>
 
-    <target name="run-sil-sil" depends="compile-sil,jar">
-        <java jar="target/jar/consys.jar" fork="true">
-            <arg value="de.userk.consys.sil.SILSensorActorFactory" />
-        </java>
-    </target>
-
-    <target name="run-gui-gui" depends="compile-gui,jar">
+    <target name="run" depends="jar">
         <java jar="target/jar/consys.jar" fork="true" modulepath="lib/javafx">
             <jvmarg line="--add-modules javafx.controls"/>
-            <arg value="de.userk.consys.gui.GuiSensorActorFactory" />
-        </java>
-    </target>
-
-    <target name="run-sil-gui" depends="compile-gui,compile-sil,jar">
-        <java jar="target/jar/consys.jar" fork="true" modulepath="lib/javafx">
-            <jvmarg line="--add-modules javafx.controls"/>
-            <arg value="de.userk.consys.sil.SILSensorActorFactory" />
-            <arg value="de.userk.consys.gui.GuiSensorActorFactory" />
         </java>
     </target>
 </project>

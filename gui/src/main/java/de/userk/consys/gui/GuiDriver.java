@@ -14,9 +14,12 @@ public class GuiDriver implements Driver {
     }
 
     @Override
-    public void handle(DriverCmd cmd) {
-        Platform.runLater(() -> {
-            label.setText("currently driving: " + cmd.toString());
+    public void handle(final DriverCmd cmd) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                label.setText("currently driving: " + cmd.toString());
+            }
         });
     }
 

@@ -25,8 +25,11 @@ public class GuiSensorActorFactory implements SensorActorFactory {
     public GuiSensorActorFactory() {
         log.info("instanciating gui");
         gui = new Gui();
-        thread = new Thread(() -> {
-            Application.launch(TempApp.class);
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Application.launch(TempApp.class);
+            }
         });
         thread.start();
 

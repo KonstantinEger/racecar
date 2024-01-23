@@ -5,65 +5,91 @@ import de.userk.consys.actors.DriverCmd;
 import de.userk.consys.actors.SteerCmd;
 import de.userk.consys.actors.Steering;
 import de.userk.consys.sensors.Sensor;
+import de.userk.consys.sensors.SensorObserver;
 import de.userk.log.Logger;
+
+import java.util.Properties;
 
 /**
  * The Controller is a decision maker. It registers itself to sensors
  * passed to the constructor and saves their values for making a decision when
  * controller.step() is called. The respective commands are passed immediately
- * to the actors. A {@ Thread} can be started to call controller.step() in a
+ * to the actors. A Thread can be started to call controller.step() in a
  * loop by calling controller.stepInLoop().
  */
 public class Controller {
     private static final Logger log = Logger.forClass(Controller.class);
+    private final int SENSOR_LOWER_LIMIT;
     private final Driver driver;
     private final Steering steering;
     private final SensorData sensorData;
+    private ControllerState state = ControllerState.ForwardStraight;
 
     private boolean threadRunning = false;
     private Thread loopThread;
 
-    public Controller(Driver driver, Steering steering, Sensor fLeft, Sensor fRight, Sensor bLeft, Sensor bRight) {
+    public Controller(Properties props, Driver driver, Steering steering, Sensor fLeft, Sensor fRight, Sensor bLeft, Sensor bRight) {
         this.driver = driver;
         this.steering = steering;
         this.sensorData = new SensorData();
+        this.SENSOR_LOWER_LIMIT = Integer.parseInt(props.getProperty("racecar.ctrl.sensor-lower-limit", "40"));
 
-        fLeft.registerObserver(value -> sensorData.frontLeft = value);
-        bLeft.registerObserver(value -> sensorData.backLeft = value);
-        fRight.registerObserver(value -> sensorData.frontRight = value);
-        bRight.registerObserver(value -> sensorData.backRight = value);
+        fLeft.registerObserver(new SensorObserver() { public void newValue(int value) { sensorData.frontLeft = value; } });
+        fRight.registerObserver(new SensorObserver() { public void newValue(int value) { sensorData.frontRight = value; } });
+        bLeft.registerObserver(new SensorObserver() { public void newValue(int value) { sensorData.backLeft = value; } });
+        bRight.registerObserver(new SensorObserver() { public void newValue(int value) { sensorData.backRight = value; } });
+
+        log.info("controller sensor limit: %d", SENSOR_LOWER_LIMIT);
     }
 
     public void step() {
         log.debug("starting decision process");
         if (!sensorData.isInitialized()) {
-            log.debug("some sensor data invalid; aborting decision");
+            log.warn("some sensor data invalid; aborting decision");
             return;
         }
 
-        SteerCmd steerCmd = SteerCmd.STRAIGHT;
-        DriverCmd driverCmd = DriverCmd.FORWARD;
-
-        // Reading freshest sensor values. This is thread safe because its only reading,
-        // never writing.
         int frontLeft = sensorData.frontLeft;
         int frontRight = sensorData.frontRight;
         int backLeft = sensorData.backLeft;
         int backRight = sensorData.backRight;
-        log.debug("using values (fl, fr, bl, br): (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
+        log.debug("using values: (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
 
-        if (frontLeft < 30 || frontRight < 30) {
-            // close to a wall, turn towards more space
-            steerCmd = frontLeft < frontRight ? SteerCmd.RIGHT : SteerCmd.LEFT;
+        switch (state) {
+            case ForwardStraight:
+            case ForwardRight:
+            case ForwardLeft:
+                if (frontRight < SENSOR_LOWER_LIMIT && frontLeft < SENSOR_LOWER_LIMIT) {
+                    if (backLeft <= backRight) {
+                        state = ControllerState.BackwardLeft;
+                    } else {
+                        state = ControllerState.BackwardRight;
+                    }
+                }
+                if (frontRight < SENSOR_LOWER_LIMIT && frontLeft > SENSOR_LOWER_LIMIT) {
+                    state = ControllerState.ForwardLeft;
+                }
+                if (frontRight > SENSOR_LOWER_LIMIT && frontLeft < SENSOR_LOWER_LIMIT) {
+                    state = ControllerState.ForwardRight;
+                }
+                if (frontRight > SENSOR_LOWER_LIMIT && frontLeft > SENSOR_LOWER_LIMIT) {
+                    state = ControllerState.ForwardStraight;
+                }
+                break;
+            case BackwardLeft:
+                if (backLeft < SENSOR_LOWER_LIMIT || backRight < SENSOR_LOWER_LIMIT) {
+                    state = ControllerState.ForwardStraight;
+                }
+                break;
+            case BackwardRight:
+                if (backRight < SENSOR_LOWER_LIMIT || backLeft < SENSOR_LOWER_LIMIT) {
+                    state = ControllerState.ForwardStraight;
+                }
+                break;
         }
-        // if (frontLeft < 50 || frontRight < 50) {
-        // // close to a wall, turn towards more space
-        // steerCmd = frontLeft < frontRight ? SteerCmd.RIGHT : SteerCmd.LEFT;
-        // }
 
-        // if (frontLeft < 20 && frontRight < 20) {
-        // driverCmd = DriverCmd.STOP;
-        // }
+        DriverCmd driverCmd = driverCmdFromState(state);
+        SteerCmd steerCmd = steerCmdFromState(state);
 
         driver.handle(driverCmd);
         log.debug("sent driver command: %s", driverCmd);
@@ -71,20 +97,49 @@ public class Controller {
         log.debug("sent steering command: %s", steerCmd);
     }
 
-    public void stepInLoop(long timeStep) {
+    private static DriverCmd driverCmdFromState(ControllerState state) {
+        switch(state) {
+            case ForwardStraight:
+            case ForwardLeft:
+            case ForwardRight:
+                return DriverCmd.FORWARD;
+            case BackwardLeft:
+            case BackwardRight:
+                return DriverCmd.BACKWARD;
+            default:
+                return DriverCmd.STOP;
+        }
+    }
+
+    private static SteerCmd steerCmdFromState(ControllerState state) {
+        switch (state) {
+            case ForwardRight:
+            case BackwardRight:
+                return SteerCmd.RIGHT;
+            case ForwardLeft:
+            case BackwardLeft:
+                return SteerCmd.LEFT;
+            default:
+                return SteerCmd.STRAIGHT;
+        }
+    }
+
+    public void stepInLoop(final long timeStep) {
         log.info("starting step loop; stepping every %d ms", timeStep);
         threadRunning = true;
-        loopThread = new Thread(() -> {
-            while (threadRunning) {
-                try {
-                    Thread.sleep(timeStep);
-                } catch (InterruptedException e) {
-                    log.warn("step loop thread stopped because of exception: %s", e);
-                }
+        loopThread = new Thread() {
+            public void run() {
+                while (threadRunning) {
+                    try {
+                        Thread.sleep(timeStep);
+                    } catch (InterruptedException e) {
+                        log.warn("step loop thread stopped because of exception: %s", e);
+                    }
 
-                Controller.this.step();
+                    Controller.this.step();
+                }
             }
-        });
+        };
         loopThread.start();
     }
 

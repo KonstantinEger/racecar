@@ -18,18 +18,21 @@ public class GuiSteering implements Steering {
     }
 
     @Override
-    public void handle(SteerCmd cmd) {
-        Platform.runLater(() -> {
-            switch (cmd) {
-                case STRAIGHT:
-                    imageView.rotateProperty().set(180);
-                    break;
-                case LEFT:
-                    imageView.rotateProperty().set(180 - 45);
-                    break;
-                case RIGHT:
-                    imageView.rotateProperty().set(180 + 45);
-                    break;
+    public void handle(final SteerCmd cmd) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                switch (cmd) {
+                    case STRAIGHT:
+                        imageView.rotateProperty().set(180);
+                        break;
+                    case LEFT:
+                        imageView.rotateProperty().set(180 - 45);
+                        break;
+                    case RIGHT:
+                        imageView.rotateProperty().set(180 + 45);
+                        break;
+                }
             }
         });
     }
