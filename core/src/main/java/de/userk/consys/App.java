@@ -1,7 +1,10 @@
 package de.userk.consys;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ServerSocket;
 import java.util.Properties;
 
 import de.userk.consys.actors.Driver;
@@ -11,6 +14,7 @@ import de.userk.consys.sensors.Sensor;
 import de.userk.consys.sensors.filter.AllFilters;
 import de.userk.consys.sensors.filter.SensorFilterAdapter;
 import de.userk.log.Logger;
+import de.userk.log.NetOutStream;
 
 public class App {
     private static final Logger log = Logger.forClass(App.class);
@@ -19,7 +23,12 @@ public class App {
     public static void main(String[] args) throws Exception {
         props = loadProperties("application.properties");
 
+        NetLogServer logServer = configureLogServer();
+        logServer.setPriority(1);
+        logServer.start();
+
         Logger.config.minLevel = Logger.Level.fromString(props.getProperty("log.level", "INFO"));
+        Logger.config.ouStream = new PrintStream(logServer.getOutputStream());
 
         String sensorFactoryClassName = props.getProperty("racecar.sensor.factory");
         String actorFactoryClassName = props.getProperty("racecar.actor.factory", sensorFactoryClassName);
@@ -68,6 +77,12 @@ public class App {
         props.load(App.class.getClassLoader().getResourceAsStream(filename));
         props.putAll(System.getProperties());
         return props;
+    }
+
+    private static NetLogServer configureLogServer() throws IOException {
+        NetOutStream outStream = new NetOutStream();
+        ServerSocket serverSocket = new ServerSocket(8080);
+        return new NetLogServer(serverSocket, outStream);
     }
 
     public static Properties getProps() {

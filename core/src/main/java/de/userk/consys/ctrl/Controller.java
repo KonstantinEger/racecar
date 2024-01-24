@@ -53,7 +53,7 @@ public class Controller {
         int frontRight = sensorData.frontRight;
         int backLeft = sensorData.backLeft;
         int backRight = sensorData.backRight;
-        log.debug("using values: (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
+        log.info("using values: (%d, %d, %d, %d)", frontLeft, frontRight, backLeft, backRight);
 
         switch (state) {
             case ForwardStraight:
@@ -87,6 +87,8 @@ public class Controller {
                 }
                 break;
         }
+
+        log.info("current state: %s", state);
 
         DriverCmd driverCmd = driverCmdFromState(state);
         SteerCmd steerCmd = steerCmdFromState(state);
